@@ -2,39 +2,105 @@ import React, { Component } from "react";
 import axios from "axios";
 
 export class movie extends Component {
+	state = {
+		movieInput: "",
+		movieList: [],
+		isToggle: false,
+		updatedInput: "",
+	};
 
-  state = {
-    movieInput: "",
-    movieList: [],
-    isToggle: false,
-    updatedInput: "",
-  };
+	componentDidMount = async () => {
+		try {
+			let allMovie = await axios.get(
+				"http://localhost:3001/grocery/get-all-grocery"
+			);
 
-  handleMovieInputOnChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
-  };
+			this.setState({
+				movieList: allMovie.data.data,
+			});
+		} catch (e) {
+			console.log(e);
+		}
+	};
 
-  handleMovieSubmit = async () => {
-    try {
-      let createdMovie = await axios.post(
-        "http://localhost:3001/movie/create-movie-list",
-        { movie: this.state.movieInput }
-      );
+	handleMovieInputOnChange = (event) => {
+		this.setState({
+			[event.target.name]: event.target.value,
+		});
+	};
 
-      let newMovieArrayList = [
-        ...this.state.movieList,
-        createdMovie.data.data,
-      ];
+	handleMovieSubmit = async () => {
+		try {
+			let createdMovie = await axios.post(
+				"http://localhost:3001/movie/create-movie-list",
+				{ movie: this.state.movieInput }
+			);
 
-      this.setState({
-        movieList: newMovieArrayList,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
+			let newMovieArrayList = [...this.state.movieList, createdMovie.data.data];
+
+			this.setState({
+				movieList: newMovieArrayList,
+			});
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+	handleDeleteByParamsID = async (id) => {
+		try {
+			let deletedMovie = await axios.delete(
+				`http://localhost:3001/movie/delete-by-id-v2/${id}`
+			);
+
+			let newDeletedMovieArrayList = this.state.movieList.filter(
+				(item) => item._id !== deletedMovie.data.data._id
+			);
+
+			this.setState({
+				movieList: newDeletedMovieArrayList,
+			});
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+	updateOnChange = (event) => {
+		this.setState({
+			[event.target.name]: event.target.value,
+		});
+	};
+
+	handleUpdateByID = async (movie) => {
+		this.setState((prevState) => {
+			return {
+				isToggle: !prevState.isToggle,
+				updatedInput: movie.movie,
+			};
+		});
+
+		try {
+			let updatedMovie = await axios.put(
+				`http://localhost:3001/movie/update-by-id-v1/${movie._id}`,
+				{
+					movie: this.state.updatedInput,
+				}
+			);
+
+			let updatedMovieListArray = this.state.movieList.map((item) => {
+				if (item._id === updatedMovie.data.data._id) {
+					item.movie = updatedMovie.data.data.movie;
+				}
+
+				return item;
+			});
+
+			this.setState({
+				movieList: updatedMovieListArray,
+			});
+		} catch (e) {
+			console.log(e);
+		}
+	};
 
 	render() {
 		return (
@@ -46,13 +112,44 @@ export class movie extends Component {
 						value={this.state.movieInput}
 						onChange={this.handleMovieInputOnChange}
 					/>
-        </div>
-        <br />
-        <button style={{ marginBottom: 10 }} onClick={this.handleMovieSubmit}>
-          Submit
-        </button>
+				</div>
+				<br />
+				<button style={{ marginBottom: 10 }} onClick={this.handleMovieSubmit}>
+					Submit
+				</button>
 
-        <br />
+				<br />
+
+				{this.state.movieList.map((item) => {
+					return (
+						<div key={item._id}>
+							{this.state.isToggle ? (
+								<input
+									type="text"
+									name="updatedInput"
+									value={this.state.updatedInput}
+									onChange={this.updateOnChange}
+								/>
+							) : (
+								<span style={{ margin: "10px" }}>{item.movie}</span>
+							)}
+
+							<button
+								onClick={() => this.handleUpdateByID(item)}
+								style={{ margin: "10px" }}
+								className="btn btn-primary">
+								Update
+							</button>
+
+							<button
+								onClick={() => this.handleDeleteByParamsID(item._id)}
+								style={{ margin: "10px" }}
+								className="btn btn-warning">
+								Delete
+							</button>
+						</div>
+					);
+				})}
 			</div>
 		);
 	}
