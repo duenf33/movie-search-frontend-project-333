@@ -5,7 +5,7 @@ export class movie extends Component {
 
   state = {
     movieInput: "",
-    groceryList: [],
+    movieList: [],
     isToggle: false,
     updatedInput: "",
   };
