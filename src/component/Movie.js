@@ -14,7 +14,6 @@ export class movie extends Component {
 			let allMovie = await axios.get(
 				"http://localhost:3001/movie/get-movie-list"
 			);
-
 			this.setState({
 				movieList: allMovie.data.data,
 			});
@@ -35,6 +34,7 @@ export class movie extends Component {
 				"http://localhost:3001/movie/create-movie-list",
 				{ movie: this.state.movieInput }
 			);
+			console.log(createdMovie);
 
 			let newMovieArrayList = [...this.state.movieList, createdMovie.data.data];
 
@@ -49,7 +49,7 @@ export class movie extends Component {
 	handleDeleteByParamsID = async (id) => {
 		try {
 			let deletedMovie = await axios.delete(
-				`http://localhost:3001/movie/delete-by-id-v2/${id}`
+				`http://localhost:3001/movie/delete-by-id/${id}`
 			);
 
 			let newDeletedMovieArrayList = this.state.movieList.filter(
@@ -80,7 +80,7 @@ export class movie extends Component {
 
 		try {
 			let updatedMovie = await axios.put(
-				`http://localhost:3001/movie/update-by-id-v1/${movie._id}`,
+				`http://localhost:3001/movie/update-by-id/${movie._id}`,
 				{
 					movie: this.state.updatedInput,
 				}
@@ -138,16 +138,14 @@ export class movie extends Component {
 							<button
 								onClick={() => this.handleUpdateByID(item)}
 								style={{ margin: "10px" }}
-								className="btn btn-primary"
-							>
+								className="btn btn-primary">
 								Update
 							</button>
 
 							<button
 								onClick={() => this.handleDeleteByParamsID(item._id)}
 								style={{ margin: "10px" }}
-								className="btn btn-warning"
-							>
+								className="btn btn-warning">
 								Delete
 							</button>
 						</div>
