@@ -12,7 +12,7 @@ export class movie extends Component {
 	componentDidMount = async () => {
 		try {
 			let allMovie = await axios.get(
-				"http://localhost:3001/grocery/get-all-grocery"
+				"http://localhost:3001/movie/get-movie-list"
 			);
 
 			this.setState({
@@ -113,6 +113,7 @@ export class movie extends Component {
 						onChange={this.handleMovieInputOnChange}
 					/>
 				</div>
+
 				<br />
 				<button style={{ marginBottom: 10 }} onClick={this.handleMovieSubmit}>
 					Submit
@@ -137,14 +138,16 @@ export class movie extends Component {
 							<button
 								onClick={() => this.handleUpdateByID(item)}
 								style={{ margin: "10px" }}
-								className="btn btn-primary">
+								className="btn btn-primary"
+							>
 								Update
 							</button>
 
 							<button
 								onClick={() => this.handleDeleteByParamsID(item._id)}
 								style={{ margin: "10px" }}
-								className="btn btn-warning">
+								className="btn btn-warning"
+							>
 								Delete
 							</button>
 						</div>
